@@ -6,7 +6,10 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Toolkit;
+import java.sql.Array;
+import java.util.Arrays;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,7 +41,15 @@ public final class LambdaFilter extends JFrame {
         /**
          * Commands.
          */
-        IDENTITY("No modifications", Function.identity());
+        IDENTITY("No modifications", Function.identity()),
+        LOWERCASE("Lowercase", s -> s.toLowerCase()),
+        NCHARS("Number of chars", s -> Integer.toString(s.length())),
+        NLINES("Number of lines", s -> Long.toString(s.chars().filter(c -> c == '\n').count() + 1)),
+        ALPHA_ORDER("List all the words in alphabetical order", 
+                s -> Arrays.stream(s.split("(\\\\s|\\\\p{Punct})+"))
+                .sorted().collect(Collectors.joining("\n"))),
+        COUNT_EACH();
+
 
         private final String commandName;
         private final Function<String, String> fun;
