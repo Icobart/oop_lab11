@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Toolkit;
-import java.sql.Array;
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,10 +45,14 @@ public final class LambdaFilter extends JFrame {
         NCHARS("Number of chars", s -> Integer.toString(s.length())),
         NLINES("Number of lines", s -> Long.toString(s.chars().filter(c -> c == '\n').count() + 1)),
         ALPHA_ORDER("List all the words in alphabetical order", 
-                s -> Arrays.stream(s.split("(\\\\s|\\\\p{Punct})+"))
+                s -> Arrays.stream(s.split("(\\s|\\p{Punct})+"))
                 .sorted().collect(Collectors.joining("\n"))),
-        COUNT_EACH();
-
+        COUNT_EACH("Count each word", s -> Arrays.stream(s.split("(\\s|\\p{Punct})+"))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet()
+                .stream()
+                .map(c -> c.getKey() + " -> " + c.getValue())
+                .collect(Collectors.joining("\n")));
 
         private final String commandName;
         private final Function<String, String> fun;
