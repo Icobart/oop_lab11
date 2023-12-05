@@ -41,7 +41,7 @@ public final class LambdaFilter extends JFrame {
          * Commands.
          */
         IDENTITY("No modifications", Function.identity()),
-        LOWERCASE("Lowercase", s -> s.toLowerCase()),
+        LOWERCASE("Lowercase", String::toLowerCase),
         NCHARS("Number of chars", s -> Integer.toString(s.length())),
         NLINES("Number of lines", s -> Long.toString(s.chars().filter(c -> c == '\n').count() + 1)),
         ALPHA_ORDER("List all the words in alphabetical order", 
