@@ -2,6 +2,7 @@ package it.unibo.oop.reactivegui02;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -38,5 +39,54 @@ public final class ConcurrentGUI extends JFrame {
         panel.add(stop);
         this.getContentPane().add(panel);
         this.setVisible(true);
+        final Agent agent = new Agent();
+        up.addActionListener(a -> agent.incrementCount());
+        down.addActionListener(a -> agent.decrementCount());
+        stop.addActionListener(a -> {
+            agent.stopCount();
+            up.setEnabled(false);
+            down.setEnabled(false);
+            stop.setEnabled(false);
+        });
+        new Thread(agent).start();
+    }
+
+    private class Agent implements Runnable {
+
+        private volatile boolean stop;
+        private volatile boolean isIncrement = true;
+        private int counter;
+
+        @Override
+        public void run() {
+            while(!this.stop) {
+                try{
+                    final var nextVal = Integer.toString(this.counter);
+                    SwingUtilities.invokeAndWait(() -> ConcurrentGUI.this.display.setText(nextVal));
+                    if(this.isIncrement) {
+                        this.counter++;
+                    }
+                    else {
+                        this.counter--;
+                    }
+                    Thread.sleep(100);
+                } catch (InvocationTargetException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void incrementCount() {
+            this.isIncrement = true;
+        }
+
+        public void decrementCount() {
+            this.isIncrement = false;
+        }
+
+        public void stopCount() {
+            this.stop = true;
+        }
+
     }
 }
